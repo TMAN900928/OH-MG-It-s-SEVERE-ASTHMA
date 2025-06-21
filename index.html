@@ -51,6 +51,13 @@
       background-color: #f1f8ff;
       border-left: 4px solid #1976d2;
     }
+    #countdown {
+      font-size: 1.5em;
+      font-weight: bold;
+      color: #d32f2f;
+      text-align: center;
+      margin-top: 15px;
+    }
   </style>
 </head>
 <body>
@@ -77,6 +84,8 @@
   <button onclick="startAlarm()">⏱️ Start 20-Minute Loading Alarm</button>
   <button onclick="stopAlarm()" id="stopBtn">🔇 Stop Alarm</button>
 
+  <p id="countdown"></p>
+
   <audio id="alarmSound" loop>
     <source src="https://actions.google.com/sounds/v1/alarms/alarm_clock.ogg" type="audio/ogg">
   </audio>
@@ -84,19 +93,30 @@
   <div class="result" id="output" style="display:none;"></div>
 
   <script>
-    let alarmTimeout;
+    let alarmTimeout, countdownInterval;
 
     function startAlarm() {
-      if (alarmTimeout) clearTimeout(alarmTimeout);
+      clearTimeout(alarmTimeout);
+      clearInterval(countdownInterval);
 
-      alarmTimeout = setTimeout(() => {
-        const alarm = document.getElementById("alarmSound");
-        alarm.play();
-        document.getElementById("stopBtn").style.display = "inline-block";
-        alert("⏰ 20 minutes are up — stop the loading dose and start maintenance!");
-      }, 20 * 60 * 1000);
+      const countdownDisplay = document.getElementById("countdown");
+      let timeLeft = 20 * 60;
 
-      alert("🔔 Alarm set for 20 minutes from now.");
+      countdownInterval = setInterval(() => {
+        const min = Math.floor(timeLeft / 60);
+        const sec = timeLeft % 60;
+        countdownDisplay.textContent = `⏳ Countdown: ${min.toString().padStart(2, '0')}:${sec.toString().padStart(2, '0')}`;
+        if (timeLeft <= 0) {
+          clearInterval(countdownInterval);
+          document.getElementById("alarmSound").play();
+          document.getElementById("stopBtn").style.display = "inline-block";
+          alert("⏰ 20 minutes are up — stop the loading dose and start maintenance!");
+        }
+        timeLeft--;
+      }, 1000);
+
+      alarmTimeout = setTimeout(() => {}, 20 * 60 * 1000);
+      alert("🔔 Alarm and countdown started for 20 minutes.");
     }
 
     function stopAlarm() {
@@ -104,6 +124,9 @@
       alarm.pause();
       alarm.currentTime = 0;
       document.getElementById("stopBtn").style.display = "none";
+      document.getElementById("countdown").textContent = "";
+      clearTimeout(alarmTimeout);
+      clearInterval(countdownInterval);
     }
 
     function calculate() {
