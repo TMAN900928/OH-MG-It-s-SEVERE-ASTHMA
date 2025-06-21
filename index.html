@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>OH M G - Severe Asthma Magnesium Calculator</title>
+  <title>OH Mg B - Severe Asthma Magnesium Calculator</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -62,8 +62,8 @@
 </head>
 <body>
 
-  <h1>OH MG, it's SEVERE ASTHMA!</h1>
-  <h2>Oxygen – Hydrocortisone – MaGnesium</h2>
+  <h1>OH Mg B, It’s SEVERE ASTHMA!</h1>
+  <h2>Oxygen – Hydrocortisone – MG – Neb Budesonide</h2>
 
   <label>Weight of child (kg):</label>
   <input type="number" id="weight" step="0.1" required>
@@ -157,6 +157,9 @@
 
       document.getElementById("output").style.display = "block";
       document.getElementById("output").innerHTML = `
+        <strong>🔷 Dilution Instruction:</strong><br>
+        • Dilute 2 vials MgSO₄ (2.47 g/vial) in 50 mL NS<br><br>
+
         <strong>🔹 Loading Dose:</strong><br>
         • Dose: <b>${loadingDoseMg.toFixed(1)} mg</b><br>
         • Volume: <b>${loadingVolumeMl.toFixed(1)} mL</b><br>
