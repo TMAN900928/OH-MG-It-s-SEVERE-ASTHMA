@@ -1,25 +1,49 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>OH M G - Severe Asthma Magnesium Calculator</title>
   <style>
     body {
       font-family: Arial, sans-serif;
       padding: 20px;
-      max-width: 650px;
+      max-width: 600px;
       margin: auto;
     }
     h1 {
       color: #d32f2f;
+      font-size: 1.6em;
     }
     h2 {
       margin-top: 0;
       color: #1976d2;
+      font-size: 1.2em;
     }
-    label, input {
-      display: block;
+    label {
       margin-top: 10px;
+      display: block;
+      font-weight: bold;
+    }
+    input {
+      width: 100%;
+      padding: 8px;
+      margin-top: 5px;
+      box-sizing: border-box;
+    }
+    button {
+      margin-top: 15px;
+      padding: 10px;
+      font-size: 1em;
+      width: 100%;
+      background-color: #1976d2;
+      color: white;
+      border: none;
+      border-radius: 4px;
+    }
+    button#stopBtn {
+      background-color: #d32f2f;
+      display: none;
     }
     .result {
       margin-top: 20px;
@@ -33,7 +57,6 @@
 
   <h1>OH M G, it's SEVERE ASTHMA!</h1>
   <h2>Oxygen – Hydrocortisone – MaGnesium Sulphate</h2>
-  <p>Use this calculator to guide MgSO₄ correction in children to raise serum magnesium to ≥2.0 mg/dL.</p>
 
   <label>Weight of child (kg):</label>
   <input type="number" id="weight" step="0.1" required>
@@ -50,11 +73,39 @@
   <label>Maintenance dose (mg/kg/hour):</label>
   <input type="number" id="maintenanceRate" step="1" value="40">
 
-  <button onclick="calculate()">Calculate</button>
+  <button onclick="calculate()">🧮 Calculate Magnesium Dose</button>
+  <button onclick="startAlarm()">⏱️ Start 20-Minute Loading Alarm</button>
+  <button onclick="stopAlarm()" id="stopBtn">🔇 Stop Alarm</button>
+
+  <audio id="alarmSound" loop>
+    <source src="https://actions.google.com/sounds/v1/alarms/alarm_clock.ogg" type="audio/ogg">
+  </audio>
 
   <div class="result" id="output" style="display:none;"></div>
 
   <script>
+    let alarmTimeout;
+
+    function startAlarm() {
+      if (alarmTimeout) clearTimeout(alarmTimeout);
+
+      alarmTimeout = setTimeout(() => {
+        const alarm = document.getElementById("alarmSound");
+        alarm.play();
+        document.getElementById("stopBtn").style.display = "inline-block";
+        alert("⏰ 20 minutes are up — stop the loading dose and start maintenance!");
+      }, 20 * 60 * 1000);
+
+      alert("🔔 Alarm set for 20 minutes from now.");
+    }
+
+    function stopAlarm() {
+      const alarm = document.getElementById("alarmSound");
+      alarm.pause();
+      alarm.currentTime = 0;
+      document.getElementById("stopBtn").style.display = "none";
+    }
+
     function calculate() {
       const weight = parseFloat(document.getElementById("weight").value);
       const currentMg = parseFloat(document.getElementById("currentMg").value);
