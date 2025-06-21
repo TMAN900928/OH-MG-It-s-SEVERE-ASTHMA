@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Magnesium Correction Calculator</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      max-width: 650px;
+      margin: auto;
+    }
+    h1 {
+      color: #d32f2f;
+    }
+    h2 {
+      margin-top: 0;
+      color: #1976d2;
+    }
+    label, input {
+      display: block;
+      margin-top: 10px;
+    }
+    .result {
+      margin-top: 20px;
+      padding: 12px;
+      background-color: #f1f8ff;
+      border-left: 4px solid #1976d2;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>OH M G, it's SEVERE ASTHMA!</h1>
+  <h2>Oxygen – Hydrocortisone – MaGnesium Sulphate</h2>
+  <p>Use this calculator to guide MgSO₄ correction in children to raise serum magnesium to ≥2.0 mg/dL.</p>
+
+  <label>Weight of child (kg):</label>
+  <input type="number" id="weight" step="0.1" required>
+
+  <label>Current Mg level (mg/dL):</label>
+  <input type="number" id="currentMg" step="0.01" required>
+
+  <label>Start time of loading dose (HH:MM, 24h format):</label>
+  <input type="time" id="startTime" required>
+
+  <label>Target time to assess Mg level (HH:MM, 24h format):</label>
+  <input type="time" id="endTime" required>
+
+  <label>Maintenance dose (mg/kg/hour):</label>
+  <input type="number" id="maintenanceRate" step="1" value="40">
+
+  <button onclick="calculate()">Calculate</button>
+
+  <div class="result" id="output" style="display:none;"></div>
+
+  <script>
+    function calculate() {
+      const weight = parseFloat(document.getElementById("weight").value);
+      const currentMg = parseFloat(document.getElementById("currentMg").value);
+      const startTimeStr = document.getElementById("startTime").value;
+      const endTimeStr = document.getElementById("endTime").value;
+      const maintenanceRate = parseFloat(document.getElementById("maintenanceRate").value);
+
+      const targetMg = 2.0;
+      const mgPerMl = 100;
+      const totalDoseMg = (targetMg - currentMg) * weight * 300;
+      const loadingDoseMg = 50 * weight;
+      const loadingVolumeMl = loadingDoseMg / mgPerMl;
+      const loadingRateMlPerHour = loadingVolumeMl / (20 / 60);
+
+      const start = new Date("1970-01-01T" + startTimeStr + ":00");
+      const end = new Date("1970-01-01T" + endTimeStr + ":00");
+      let elapsedHr = (end - start - 20 * 60 * 1000) / (1000 * 60 * 60);
+      if (elapsedHr < 0) elapsedHr = 0;
+
+      const maintenanceMgGiven = maintenanceRate * weight * elapsedHr;
+      const totalMgGiven = loadingDoseMg + maintenanceMgGiven;
+      const predictedMg = currentMg + totalMgGiven / (weight * 300);
+
+      document.getElementById("output").style.display = "block";
+      document.getElementById("output").innerHTML = `
+        <strong>🔹 Loading Dose:</strong><br>
+        • Dose: <b>${loadingDoseMg.toFixed(1)} mg</b><br>
+        • Volume: <b>${loadingVolumeMl.toFixed(1)} mL</b><br>
+        • Infuse at: <b>${loadingRateMlPerHour.toFixed(1)} mL/hour</b> over 20 minutes<br><br>
+
+        <strong>🔹 Maintenance Infusion:</strong><br>
+        • Maintenance given: <b>${maintenanceMgGiven.toFixed(1)} mg</b><br>
+        • Duration: <b>${elapsedHr.toFixed(2)} hours</b><br><br>
+
+        <strong>🔹 Estimated Serum Magnesium:</strong><br>
+        • At ${endTimeStr}: <b>${predictedMg.toFixed(2)} mg/dL</b>
+      `;
+    }
+  </script>
+
+</body>
+</html>
