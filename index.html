@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>OH Mg B - Severe Asthma Magnesium Calculator</title>
+  <title>OH Mg B - Severe Asthma Calculator</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -14,11 +14,15 @@
     h1 {
       color: #d32f2f;
       font-size: 1.6em;
+      line-height: 1.4;
+      text-align: center;
     }
-    h2 {
-      margin-top: 0;
+    .protocol {
       color: #1976d2;
-      font-size: 1.2em;
+      text-align: center;
+      font-size: 1.1em;
+      line-height: 1.6;
+      margin-bottom: 20px;
     }
     label {
       margin-top: 10px;
@@ -62,8 +66,13 @@
 </head>
 <body>
 
-  <h1>OH Mg B, It’s SEVERE ASTHMA!</h1>
-  <h2>Oxygen – Hydrocortisone – MG – Neb Budesonide</h2>
+  <h1>OH Mg B<br><span style="font-weight:bold;">IT’S SEVERE ASTHMA</span></h1>
+  <div class="protocol">
+    <div>OXYGEN</div>
+    <div>HYDROCORTISONE 4 mg/kg QID</div>
+    <div>MAGNESIUM SULPHATE</div>
+    <div>BUDESONIDE NEB 1 mg BD</div>
+  </div>
 
   <label>Weight of child (kg):</label>
   <input type="number" id="weight" step="0.1" required>
@@ -93,29 +102,33 @@
   <div class="result" id="output" style="display:none;"></div>
 
   <script>
-    let alarmTimeout, countdownInterval;
+    let countdownInterval, startTimestamp;
+    const duration = 20 * 60 * 1000; // 20 minutes
 
     function startAlarm() {
-      clearTimeout(alarmTimeout);
       clearInterval(countdownInterval);
+      stopAlarm(); // reset
 
       const countdownDisplay = document.getElementById("countdown");
-      let timeLeft = 20 * 60;
+      startTimestamp = Date.now();
 
       countdownInterval = setInterval(() => {
-        const min = Math.floor(timeLeft / 60);
-        const sec = timeLeft % 60;
-        countdownDisplay.textContent = `⏳ Countdown: ${min.toString().padStart(2, '0')}:${sec.toString().padStart(2, '0')}`;
-        if (timeLeft <= 0) {
+        const elapsed = Date.now() - startTimestamp;
+        const remaining = duration - elapsed;
+
+        if (remaining <= 0) {
           clearInterval(countdownInterval);
           document.getElementById("alarmSound").play();
           document.getElementById("stopBtn").style.display = "inline-block";
+          countdownDisplay.textContent = "⏰ Time's up!";
           alert("⏰ 20 minutes are up — stop the loading dose and start maintenance!");
+        } else {
+          const min = Math.floor(remaining / 60000);
+          const sec = Math.floor((remaining % 60000) / 1000);
+          countdownDisplay.textContent = `⏳ Countdown: ${min.toString().padStart(2, '0')}:${sec.toString().padStart(2, '0')}`;
         }
-        timeLeft--;
       }, 1000);
 
-      alarmTimeout = setTimeout(() => {}, 20 * 60 * 1000);
       alert("🔔 Alarm and countdown started for 20 minutes.");
     }
 
@@ -125,7 +138,6 @@
       alarm.currentTime = 0;
       document.getElementById("stopBtn").style.display = "none";
       document.getElementById("countdown").textContent = "";
-      clearTimeout(alarmTimeout);
       clearInterval(countdownInterval);
     }
 
@@ -138,11 +150,9 @@
 
       const targetMg = 2.0;
       const mgPerMl = 100;
-      const totalDoseMg = (targetMg - currentMg) * weight * 300;
       const loadingDoseMg = 50 * weight;
       const loadingVolumeMl = loadingDoseMg / mgPerMl;
       const loadingRateMlPerHour = loadingVolumeMl / (20 / 60);
-
       const maintenanceDoseMgPerHour = maintenanceRate * weight;
       const maintenanceRateMlPerHour = maintenanceDoseMgPerHour / mgPerMl;
 
